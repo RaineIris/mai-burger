@@ -114,7 +114,7 @@ body.modal-scroll-locked{overflow:hidden}
     <div class="toolbar" id="stickyFilters">
       <div class="tabs" id="browseTabs"><button class="tab active" data-mode="level">按等级浏览</button><button class="tab" data-mode="tag">按 Tag 浏览</button></div>
       <div class="filters">
-        <div class="field" id="levelField"><label for="levelFilter">推荐等级</label><select id="levelFilter"><option value="all">全部等级</option><option>11</option><option>11+</option><option>12</option><option>12+</option><option>13</option><option>13+</option><option>14</option></select></div>
+        <div class="field" id="levelField"><label for="levelFilter">推荐等级</label><select id="levelFilter"><option value="all">全部等级</option><option>11+</option><option>12</option><option>12+</option><option>13</option><option>13+</option></select></div>
         <div class="field"><label for="difficultyFilter">谱面难度</label><select id="difficultyFilter"><option value="all">全部难度</option><option value="红谱">Expert</option><option value="紫谱">Master</option><option value="白谱">Re:MASTER</option></select></div>
         <div class="field"><label for="rankFilter">吃分评级</label><select id="rankFilter"><option value="all">全部评级</option><option>S</option><option>A+</option><option>A</option><option>B</option><option>C</option></select></div>
         <div class="field"><label for="versionFilter">版本</label><select id="versionFilter"><option value="all">全部版本</option></select></div>
@@ -139,7 +139,7 @@ body.modal-scroll-locked{overflow:hidden}
         <input id="editKey" type="hidden">
         <div class="admin-grid">
           <div class="field span2"><label for="songTitle">歌曲名称 *</label><input id="songTitle" required placeholder="输入曲名"></div>
-          <div class="field"><label for="songLevel">推荐等级 *</label><select id="songLevel" required><option>11</option><option>11+</option><option>12</option><option>12+</option><option>13</option><option>13+</option><option>14</option></select></div>
+          <div class="field"><label for="songLevel">推荐等级 *</label><select id="songLevel" required><option>11+</option><option>12</option><option>12+</option><option>13</option><option>13+</option></select></div>
           <div class="field"><label for="songDifficulty">谱面难度 *</label><select id="songDifficulty" required><option value="红谱">Expert</option><option value="紫谱">Master</option><option value="白谱">Re:MASTER</option></select></div>
           <div class="field"><label for="songVersion">版本 *</label><select id="songVersion" required><option value="">请选择版本</option></select></div>
           <div class="field"><label for="songCategory">分类 *</label><select id="songCategory" required><option value="">请选择分类</option></select></div>
@@ -186,7 +186,7 @@ body.modal-scroll-locked{overflow:hidden}
 <script>
 (() => {
 const DEFAULT_TAGS = ["练习曲","红转紫推荐","键盘","散打","交互","轴交互","含长交互","高速交互","纵连","定拍","跳拍","双押","含转圈","含扫键","错位","一笔画","慢星星","拆弹","穿心","cycles星星","发牌星星","协调","手序","底力","定位"];
-const LEVELS = ["11","11+","12","12+","13","13+","14"];
+const LEVELS = ["11+","12","12+","13","13+"];
 const DIFFS = ["红谱","紫谱","白谱"];
 const RANKS = ["S","A+","A","B","C"];
 const VERSIONS = ["舞萌DX2026（彩）","舞萌DX2025（镜）","舞萌DX2024（双宴）","舞萌DX2023（祭祝）","舞萌DX2022（宙星）","舞萌DX2021（爽煌）","舞萌DX2020（熊华）","FiNALE（辉）","MiLK PLUS（雪）","MiLK（白）","MURASAKi PLUS（菫）","MURASAKi（紫）","PiNK PLUS（樱）","PiNK（桃）","ORANGE PLUS（晓）","ORANGE（橙）","GreeN PLUS（橄）","GreeN（超）","maimai PLUS（真）","maimai（真）"];
@@ -227,9 +227,9 @@ function ratingColor(n){
  return "#a8adb5";
 }
 function recommendationForRating(n){
- if(n>=16000)return {levels:["14"],note:"爱几把打啥打啥，<del>毕竟我也没有能推荐给你的14+</del>"};
- if(n>=15500)return {levels:["14"],note:"以 14 为主。"};
- if(n>=15300)return {levels:["13+","14"],note:"可以开始尝试 14，视个人情况调整。"};
+ if(n>=16000)return {levels:[],note:"爱几把打啥打啥，<del>毕竟我也没有能推荐给你的14+</del>"};
+ if(n>=15500)return {levels:[],note:"以 14 为主。"};
+ if(n>=15300)return {levels:["13+"],note:"可以开始尝试 14，视个人情况调整。"};
  if(n>=15000)return {levels:["13+"],note:"推荐打 13+。"};
  if(n>=14500)return {levels:["13","13+"],note:"推荐打 13～13+。"};
  if(n>=14000)return {levels:["12+","13"],note:"推荐打 12+～13。"};
