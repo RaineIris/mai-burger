@@ -60,6 +60,12 @@ body{background:#fffcf5}
 
 /* Lighter Re:MASTER pastel; maintain readable constant text */
 .level-pill[style*="#e9c9f5"],.detail-constant[style*="#e9c9f5"]{color:#fff!important}
+/* Static construction sign for levels with no songs */
+.construction-empty{padding:46px 15px 42px;background:#fffdf7;border:1px dashed #e7c977;border-radius:17px;text-align:center}
+.construction-heading{display:inline-flex;align-items:center;justify-content:center;gap:7px;transform:rotate(-4deg);transform-origin:center;margin-bottom:14px}
+.construction-heading strong{font-size:clamp(25px,6vw,37px);font-weight:950;letter-spacing:.07em;color:#9d701c;text-shadow:2px 3px 0 #f9e6a7;line-height:1.35}
+.construction-hammer{width:45px;height:45px;flex:none;transform:rotate(13deg);filter:drop-shadow(1px 2px 0 #e8cb83)}
+.construction-empty p{margin:0;color:var(--muted);font-size:12px}
 </style>
 
 <style>
@@ -292,7 +298,8 @@ function songCard(s){const k=keyOf(s),color=chartColor(s),img=s.image?`<img clas
 function filteredSongs(favOnly=false){let arr=songs.filter(s=>{if(favOnly&&!isFav(s))return false;if($("levelFilter").value!=="all"&&mode==="level"&&s.level!==$("levelFilter").value)return false;if($("difficultyFilter").value!=="all"&&s.difficulty!==$("difficultyFilter").value)return false;if($("rankFilter").value!=="all"&&s.rank!==$("rankFilter").value)return false;if($("versionFilter").value!=="all"&&(s.version||"")!==$("versionFilter").value)return false;if($("categoryFilter").value!=="all"&&(s.category||"")!==$("categoryFilter").value)return false;if(mode==="tag"&&selectedTags.size&&!Array.from(selectedTags).every(t=>(s.tags||[]).includes(t)))return false;const q=$("searchInput").value.trim().toLocaleLowerCase();if(q&&!`${s.title} ${(s.aliases||[]).join(" ")} ${s.externalId||""} ${s.version||""} ${s.category||""} ${s.comment||""}`.toLocaleLowerCase().includes(q))return false;return true});
 const sort=$("sortFilter").value;arr.sort((a,b)=>{const playedDiff=Number(isPlayed(a))-Number(isPlayed(b));if(playedDiff)return playedDiff;if(sort==="rank")return (RANK_ORDER[a.rank]??9)-(RANK_ORDER[b.rank]??9)||b.constant-a.constant;return b.constant-a.constant||((RANK_ORDER[a.rank]??9)-(RANK_ORDER[b.rank]??9))});return arr}
 function attachCardEvents(root){root.querySelectorAll("[data-detail]").forEach(b=>b.addEventListener("click",()=>{const s=songs.find(s=>keyOf(s)===b.dataset.detail);if(s)openDetail(s)}));root.querySelectorAll("[data-fav]").forEach(b=>b.addEventListener("click",()=>toggleFav(b.dataset.fav)))}
-function renderSongs(){const arr=filteredSongs();$("listTitle").textContent=mode==="tag"?"Tag 推荐曲目":"推荐曲目";$("resultCount").textContent=arr.length+" 首";$("songList").innerHTML=arr.length?arr.map(songCard).join(""):`<div class="empty"><strong>这里还没有曲目</strong>请调整筛选条件。</div>`;attachCardEvents($("songList"))}
+function constructionEmpty(){return `<div class="construction-empty"><div class="construction-heading"><strong>施工中……</strong><svg class="construction-hammer" viewBox="0 0 64 64" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M29 29 L48 49 Q52 53 48 57 Q44 61 40 56 L22 36 Z" fill="#e4a44e" stroke="#85541c" stroke-width="3" stroke-linejoin="round"/><path d="M13 13 Q23 5 35 13 L41 19 L33 28 L27 23 L19 31 L10 22 Z" fill="#a9b7c4" stroke="#647484" stroke-width="3" stroke-linejoin="round"/><path d="M33 13 L43 7 L54 18 L45 27 L37 21 Z" fill="#c8d2dc" stroke="#647484" stroke-width="3" stroke-linejoin="round"/><path d="M9 38 L13 43 M5 30 L11 31 M17 45 L18 51" stroke="#e7b440" stroke-width="3" stroke-linecap="round"/></svg></div><p>这里还没有曲目</p></div>`}
+function renderSongs(){const arr=filteredSongs();$("listTitle").textContent=mode==="tag"?"Tag 推荐曲目":"推荐曲目";$("resultCount").textContent=arr.length+" 首";$("songList").innerHTML=arr.length?arr.map(songCard).join(""):(mode==="level"&&$("levelFilter").value!=="all"&&!songs.some(s=>s.level===$("levelFilter").value)?constructionEmpty():`<div class="empty"><strong>这里还没有曲目</strong>请调整筛选条件。</div>`);attachCardEvents($("songList"))}
 function renderFavorites(){const arr=songs.filter(isFav).sort((a,b)=>Number(isPlayed(a))-Number(isPlayed(b))||String(a.externalId||"").localeCompare(String(b.externalId||""),undefined,{numeric:true}));$("favoriteList").innerHTML=arr.length?arr.map(songCard).join(""):`<div class="empty"><strong>这里还什么也没有……</strong>看到想打的曲目时，点一下 ☆ 收藏，方便下次查找。</div>`;attachCardEvents($("favoriteList"))}
 function toggleFav(k){if(favorites.includes(k))favorites=favorites.filter(x=>x!==k);else favorites.push(k);save();renderSongs();renderFavorites();if($("updateSongList")){const list=$("updateSongList");const visible=[...list.querySelectorAll("article.song")].map(el=>songs.find(s=>keyOf(s)===el.dataset.key)).filter(Boolean);list.innerHTML=visible.map(songCard).join("");attachCardEvents(list)}}
 function displayDifficulty(value){return ({"红谱":"Expert","紫谱":"Master","白谱":"Re:MASTER","Expert":"Expert","Master":"Master","Re:Master":"Re:MASTER","Re:MASTER":"Re:MASTER"})[value]||value||"未填写难度"}
@@ -335,6 +342,7 @@ const UPDATE_ANNOUNCEMENT = {
   enabled: true,
   id: "level11plus-20261031-01",
   title: "11+ 级曲库上新啦！",
+  updatedAt: "", // 下次发布曲库公告时填写北京时间，例如 2026-11-18T16:35+08:00
   description: "本次新增 9 张 11+ 推荐谱面。",
   songKeys: [{"id":"11190","difficulty":"紫谱"},{"id":"11512","difficulty":"红谱"},{"id":"11697","difficulty":"紫谱"},{"id":"694","difficulty":"红谱"},{"id":"11638","difficulty":"红谱"},{"id":"11678","difficulty":"红谱"},{"id":"11637","difficulty":"紫谱"},{"id":"587","difficulty":"红谱"},{"id":"670","difficulty":"红谱"}]
 };
@@ -355,7 +363,7 @@ function showUpdateAnnouncement(force=false){
   const root=$("updateModalRoot");
   const more=entries.length>2;
   root.innerHTML=`<div class="update-backdrop" id="updateBackdrop"><section class="update-dialog" role="dialog" aria-modal="true" aria-labelledby="updateTitle">
-    <div class="update-header"><h2 id="updateTitle">${safe(a.title||"曲库更新")}</h2></div>
+    <div class="update-header"><div><h2 id="updateTitle">${safe(a.title||"曲库更新")}</h2><div class="hint" style="margin-top:5px">${a.updatedAt&&Number.isFinite(Date.parse(a.updatedAt))?`更新于 ${new Intl.DateTimeFormat("zh-CN",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(a.updatedAt))}`:"更新时间未记录"}</div></div></div>
     <div class="update-scroll" id="updateScroll"><p class="update-description">${safe(a.description||"本次新增曲目")}</p>
       <div class="update-song-list" id="updateSongList">${entries.slice(0,2).map(songCard).join("")}</div>
       ${more?'<button type="button" class="btn update-more" id="updateExpand">展开全部（'+entries.length+' 首）</button>':""}
